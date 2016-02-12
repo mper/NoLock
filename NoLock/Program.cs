@@ -12,7 +12,7 @@ namespace NoLock
             int? interval = null;
             int tmp;
             if (args.Length > 0 && int.TryParse(args[0], out tmp))
-                interval = tmp;
+                interval = tmp * 1000;
 
             Application.Run(new NoLockTrayForm(interval));
         }
