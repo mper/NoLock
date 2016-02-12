@@ -21,6 +21,7 @@ namespace NoLock
             set { interval = value; }
         }
 
+        public event EventHandler MouseMoved;
 
         public MouseMovement(int? interval)
         {
@@ -37,10 +38,17 @@ namespace NoLock
                     Cursor.Position = new Point(Cursor.Position.X - 1, Cursor.Position.Y);
                     Thread.Yield();
                     Cursor.Position = new Point(Cursor.Position.X + 1, Cursor.Position.Y);
-                    Thread.Sleep(Interval);
+                    onMouseMoved();
+                    moveMouseCancelation.WaitHandle.WaitOne(Interval);
                 }
 
             }, moveMouseCancelation);
+        }
+
+        private void onMouseMoved()
+        {
+            if(MouseMoved != null)
+                MouseMoved(this, new EventArgs());
         }
 
         public void Dispose()
