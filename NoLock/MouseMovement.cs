@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace NoLock
 {
-    class MouseMovement : IDisposable
+    class MouseMove : IDisposable
     {
         private CancellationTokenSource moveMouseCancelationSource;
         private CancellationToken moveMouseCancelation;
@@ -20,10 +20,11 @@ namespace NoLock
             get { return interval; }
             set { interval = value; }
         }
+        public DateTime LastMouseMoved { get; private set; }
 
         public event EventHandler MouseMoved;
 
-        public MouseMovement(int? interval)
+        public MouseMove(int? interval)
         {
             if (interval.HasValue)
                 Interval = interval.Value;
@@ -35,9 +36,12 @@ namespace NoLock
             {
                 while (!moveMouseCancelation.IsCancellationRequested)
                 {
-                    Cursor.Position = new Point(Cursor.Position.X - 1, Cursor.Position.Y);
+                    int cursorPosX = Cursor.Position.X;
+                    int cursorPosY = Cursor.Position.Y;
+                    int cursorPosMove = cursorPosX > 0 ? -1 : 1;
+                    Cursor.Position = new Point(cursorPosX + cursorPosMove, cursorPosY);
                     Thread.Yield();
-                    Cursor.Position = new Point(Cursor.Position.X + 1, Cursor.Position.Y);
+                    //Cursor.Position = new Point(cursorPosX + cursorPosMove * -1, cursorPosY);
                     onMouseMoved();
                     moveMouseCancelation.WaitHandle.WaitOne(Interval);
                 }
@@ -47,7 +51,8 @@ namespace NoLock
 
         private void onMouseMoved()
         {
-            if(MouseMoved != null)
+            LastMouseMoved = DateTime.Now;
+            if (MouseMoved != null)
                 MouseMoved(this, new EventArgs());
         }
 
