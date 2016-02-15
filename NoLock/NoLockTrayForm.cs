@@ -27,7 +27,7 @@ namespace NoLock
             trayIcon.Text = "NoLock";
             trayIcon.Icon = new Icon(Icon.ExtractAssociatedIcon(Application.ExecutablePath), 40, 40);
             trayIcon.ContextMenu = trayMenu;
-            trayIcon.Click += trayIcon_Click;
+            trayIcon.MouseClick += trayIcon_MouseClick;
             
             mouse = new MouseMove(interval);
             infoMenuItem.Text = string.Concat("Interval: ", (mouse.Interval / 1000d).ToString(), "s");
@@ -38,10 +38,11 @@ namespace NoLock
             trayMenuDisplayTimer.Tick += trayMenuDisplayTimer_Tick;
         }
 
-        private void trayIcon_Click(object sender, EventArgs e)
+        private void trayIcon_MouseClick(object sender, MouseEventArgs e)
         {
-            typeof(NotifyIcon).GetMethod("ShowContextMenu",
-                BindingFlags.Instance | BindingFlags.NonPublic).Invoke(trayIcon, null);
+            if(e.Button == MouseButtons.Left)
+                typeof(NotifyIcon).GetMethod("ShowContextMenu",
+                    BindingFlags.Instance | BindingFlags.NonPublic).Invoke(trayIcon, null);
         }
 
         protected override void OnLoad(EventArgs e)
